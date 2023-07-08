@@ -9,7 +9,13 @@ import * as moment from 'moment';
 import { Response } from './data/response.data';
 import { ICommonResponse } from 'src/interfaces/response.interface';
 
-import { encryptMessage, generateHash, generateSalt } from './utils/crypt';
+import {
+  decryptMessage,
+  encryptMessage,
+  generateHash,
+  generateSalt,
+} from './utils/crypt';
+import { DecryptSecretDto } from './dto/passphrase.dto';
 
 @ApiTags('secret')
 @Controller('secret')
@@ -69,6 +75,29 @@ export class SecretController {
     });
 
     return secret;
+  }
+
+  @Post('/decrypt')
+  async decryptSecret(@Body() data: DecryptSecretDto) {
+    const secret = await this.secretService.findOneById(data.secretId);
+
+    if (!secret) {
+      return Response.NOT_FOUND;
+    }
+
+    const hashToMatch = generateHash(data.passphrase, secret.salt);
+    if (hashToMatch !== secret.passphrase) {
+      return Response.UNAUTHORIZED;
+    }
+
+    const decryptedMessage = decryptMessage(
+      'aes-192-cbc',
+      secret.secret,
+      data.passphrase,
+      secret.iv,
+    );
+
+    return decryptedMessage;
   }
 
   @ApiParam({

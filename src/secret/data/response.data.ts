@@ -21,4 +21,8 @@ export const Response = {
     message: 'Secret has expired.',
     status: HttpStatus.FORBIDDEN,
   },
+  UNAUTHORIZED: {
+    message: 'Secret passphrase does not match.',
+    status: HttpStatus.UNAUTHORIZED,
+  },
 };

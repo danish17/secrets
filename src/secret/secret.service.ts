@@ -12,6 +12,17 @@ export class SecretService {
   ) {}
 
   /**
+   * Find secret by its ID.
+   * @param uri
+   * @returns Secret Entity
+   */
+  async findOneById(id: number): Promise<SecretEntity> {
+    const secret = await this._repository.findOne({ where: { id: id } });
+
+    return secret;
+  }
+
+  /**
    * Find secret by its URI.
    * @param uri
    * @returns Secret Entity

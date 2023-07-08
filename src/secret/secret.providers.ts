@@ -1,10 +1,11 @@
 import { DataSource } from 'typeorm';
-import { Secret } from './entities/secret.entity';
+import { SecretEntity } from './entities/secret.entity';
 
 export const secretProviders = [
   {
     provide: 'SECRET_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(Secret),
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(SecretEntity),
     inject: ['DATA_SOURCE'],
   },
 ];

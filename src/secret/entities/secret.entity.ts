@@ -31,6 +31,9 @@ export class SecretEntity {
   @Column()
   passphrase: string;
 
+  @Column()
+  salt: string;
+
   @Column({
     type: 'text',
   })

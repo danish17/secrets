@@ -6,5 +6,6 @@ export interface ICreateSecret {
   views_left: number;
   passphrase: string;
   salt: string;
+  iv: string;
   secret: string;
 }

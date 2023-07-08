@@ -34,6 +34,9 @@ export class SecretEntity {
   @Column()
   salt: string;
 
+  @Column()
+  iv: string;
+
   @Column({
     type: 'text',
   })

@@ -39,6 +39,7 @@ export class SecretService {
     secret.viewsLeft = data.views_left;
     secret.salt = data.salt;
     secret.passphrase = data.passphrase;
+    secret.iv = data.iv;
     secret.secret = data.secret;
     await this._repository.save(secret);
 

@@ -9,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { SecretService } from './secret.service';
-import { SecretEntity } from './entities/secret.entity';
 import { encryptMessage, generateHash, generateSalt } from './utils/crypt';
 import { CreateSecretDto } from './dto/secret.dto';
 import * as moment from 'moment';
+import { SecretEntity } from './entities/secret.entity';
+import { ICommonResponse } from 'src/interfaces/response';
 
 @ApiTags('secret')
 @Controller('secret')
@@ -25,24 +26,27 @@ export class SecretController {
     description: 'Unique Identifier of the secret.',
   })
   @Get('/:uri')
-  getSecretByUri(@Param('uri') uri): string {
-    return `${uri}`;
-  }
+  async getSecretByUri(
+    @Param('uri') uri,
+  ): Promise<SecretEntity | ICommonResponse> {
+    const secret = await this.secretService.findOneByUri(uri);
 
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    description: 'ID of the secret.',
-  })
-  @Get('/:id')
-  async getSecretById(@Param('id') id): Promise<SecretEntity | HttpStatus> {
-    const findResult = await this.secretService.findOneById(id);
-
-    if (!findResult) {
-      return HttpStatus.NOT_FOUND;
+    if (!secret) {
+      return {
+        message: 'Secret not found',
+        status: HttpStatus.NOT_FOUND,
+      };
     }
 
-    return findResult;
+    if (secret.viewsLeft <= 0) {
+      return {
+        message: 'Secret has expired.',
+        status: HttpStatus.FORBIDDEN,
+      };
+    }
+
+    await this.secretService.decreaseViews(secret);
+    return secret;
   }
 
   @Post()

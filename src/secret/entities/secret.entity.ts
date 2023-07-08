@@ -1,14 +1,8 @@
 import { IsDate, IsInt, Min } from 'class-validator';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class Secret {
+@Entity('secret')
+export class SecretEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,7 +10,6 @@ export class Secret {
   @Column()
   uri: string;
 
-  @CreateDateColumn()
   @Column({ name: 'created_at' })
   @IsDate()
   createdAt: Date;

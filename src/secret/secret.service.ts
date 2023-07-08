@@ -11,13 +11,27 @@ export class SecretService {
     private _repository: Repository<SecretEntity>,
   ) {}
 
+  /**
+   * Find secret by its URI.
+   * @param uri
+   * @returns Secret Entity
+   */
   async findOneByUri(uri: string): Promise<SecretEntity> {
     const secret = await this._repository.findOne({ where: { uri: uri } });
 
     return secret;
   }
 
+  /**
+   * Function to reduce views of a secret.
+   * @param secret Secret to operate upon
+   * @returns Updated Secret Entity
+   */
   async decreaseViews(secret: SecretEntity): Promise<SecretEntity> {
+    if (secret.viewsLeft <= 0) {
+      return secret;
+    }
+
     secret.viewsLeft -= 1;
 
     await this._repository.save(secret);
@@ -48,7 +62,7 @@ export class SecretService {
   /**
    * Creates a secret in database.
    * @param data
-   * @returns SecretEntity
+   * @returns Secret Entity
    */
   async createSecret(data: ICreateSecret): Promise<SecretEntity> {
     const secret = new SecretEntity();
@@ -64,5 +78,17 @@ export class SecretService {
     await this._repository.save(secret);
 
     return secret;
+  }
+
+  async shredSecret(id: number): Promise<number> {
+    const secret = await this._repository.findOne({ where: { id: id } });
+
+    if (!secret) {
+      return -1;
+    }
+
+    await this._repository.delete(secret);
+
+    return 0;
   }
 }

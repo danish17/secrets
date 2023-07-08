@@ -1,19 +1,15 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { SecretService } from './secret.service';
-import { encryptMessage, generateHash, generateSalt } from './utils/crypt';
 import { CreateSecretDto } from './dto/secret.dto';
-import * as moment from 'moment';
 import { SecretEntity } from './entities/secret.entity';
-import { ICommonResponse } from 'src/interfaces/response';
+
+import * as moment from 'moment';
+
+import { Response } from './data/response.data';
+import { ICommonResponse } from 'src/interfaces/response.interface';
+
+import { encryptMessage, generateHash, generateSalt } from './utils/crypt';
 
 @ApiTags('secret')
 @Controller('secret')
@@ -32,17 +28,11 @@ export class SecretController {
     const secret = await this.secretService.findOneByUri(uri);
 
     if (!secret) {
-      return {
-        message: 'Secret not found',
-        status: HttpStatus.NOT_FOUND,
-      };
+      return Response.NOT_FOUND;
     }
 
     if (secret.viewsLeft <= 0) {
-      return {
-        message: 'Secret has expired.',
-        status: HttpStatus.FORBIDDEN,
-      };
+      return Response.EXPIRED;
     }
 
     await this.secretService.decreaseViews(secret);
@@ -52,6 +42,7 @@ export class SecretController {
   @Post()
   async createSecret(@Body() data: CreateSecretDto) {
     const { validFor, viewsAllowed, passphrase, secret: secretContent } = data;
+
     const salt = generateSalt();
     const hashedPassphrase = generateHash(passphrase, salt);
     const createdAt = moment();
@@ -86,10 +77,16 @@ export class SecretController {
     description: 'ID of the secret to be shredded',
   })
   @Delete('/shred/:id')
-  deleteSecretById(
+  async deleteSecretById(
     @Param('id')
     id,
-  ): HttpStatus {
-    return HttpStatus.OK;
+  ): Promise<ICommonResponse> {
+    const res = await this.secretService.shredSecret(id);
+
+    if (res === -1) {
+      return Response.NOT_FOUND;
+    }
+
+    return Response.DELETED;
   }
 }

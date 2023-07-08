@@ -11,10 +11,24 @@ export class SecretService {
     private _repository: Repository<SecretEntity>,
   ) {}
 
-  findOneById(id: number) {
-    return this._repository.findOne({ where: { id: id } });
+  async findOneByUri(uri: string): Promise<SecretEntity> {
+    const secret = await this._repository.findOne({ where: { uri: uri } });
+
+    return secret;
   }
 
+  async decreaseViews(secret: SecretEntity): Promise<SecretEntity> {
+    secret.viewsLeft -= 1;
+
+    await this._repository.save(secret);
+
+    return secret;
+  }
+
+  /**
+   * Generates a *unique* URI that can be used to identify the secret.
+   * @returns First 7 digits of MD5 String
+   */
   async generateUri() {
     const last_record = await this._repository
       .createQueryBuilder('secret')
@@ -27,9 +41,15 @@ export class SecretService {
       .update(last_record.id.toString())
       .digest('base64');
 
+    digest.replaceAll(/[^a-zA-Z0-9 -]/, '');
     return digest.substring(0, 7);
   }
 
+  /**
+   * Creates a secret in database.
+   * @param data
+   * @returns SecretEntity
+   */
   async createSecret(data: ICreateSecret): Promise<SecretEntity> {
     const secret = new SecretEntity();
     secret.uri = data.uri;

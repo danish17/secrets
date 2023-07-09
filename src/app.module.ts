@@ -7,6 +7,8 @@ import { DatabaseModule } from './database/database.module';
 import { secretProviders } from './secret/secret.providers';
 import { ConfigModule } from '@nestjs/config';
 import { config } from './config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -14,9 +16,21 @@ import { config } from './config';
       isGlobal: true,
       load: [config],
     }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     DatabaseModule,
   ],
   controllers: [AppController, SecretController],
-  providers: [...secretProviders, AppService, SecretService],
+  providers: [
+    ...secretProviders,
+    AppService,
+    SecretService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

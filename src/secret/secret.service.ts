@@ -66,8 +66,7 @@ export class SecretService {
       .update(last_record.id.toString())
       .digest('base64');
 
-    digest.replaceAll(/[^a-zA-Z0-9 -]/g, '');
-    return digest.substring(0, 7);
+    return digest.replaceAll(/[^a-zA-Z0-9 -]/g, '').substring(0, 7);
   }
 
   /**

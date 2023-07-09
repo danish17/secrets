@@ -58,7 +58,7 @@ export const encryptMessage = (algorithm, content, passphrase) => {
 
   return {
     cipherText,
-    iv: iv.toString(),
+    iv: iv.toString('base64'),
   };
 };
 
@@ -72,7 +72,12 @@ export const encryptMessage = (algorithm, content, passphrase) => {
  */
 export const decryptMessage = (algorithm, cipherText, passphrase, iv) => {
   const key = crypto.scryptSync(passphrase, 'GfG', 24);
-  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+
+  const decipher = crypto.createDecipheriv(
+    algorithm,
+    key,
+    Buffer.from(iv, 'base64'),
+  );
 
   let decryptedText = decipher.update(
     Buffer.from(cipherText, 'base64').toString('hex'),

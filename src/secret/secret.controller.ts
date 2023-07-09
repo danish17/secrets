@@ -41,6 +41,10 @@ export class SecretController {
       return Response.EXPIRED;
     }
 
+    if (moment(secret.expiresAt).isBefore(moment())) {
+      return Response.EXPIRED;
+    }
+
     await this.secretService.decreaseViews(secret);
     return secret;
   }
@@ -52,7 +56,7 @@ export class SecretController {
     const salt = generateSalt();
     const hashedPassphrase = generateHash(passphrase, salt);
     const createdAt = moment();
-    const expiresAt = createdAt.add(validFor, 'h');
+    const expiresAt = moment(createdAt).add(validFor, 'hours');
     const uri = await this.secretService.generateUri();
 
     // Store secret message as ciphertext.

@@ -40,7 +40,7 @@ export const validatePassword = (attemptedPlainPassword, salt, hash) => {
  * @returns Object
  */
 export const encryptMessage = (algorithm, content, passphrase) => {
-  const iv = Buffer.alloc(16, 0);
+  const iv = crypto.randomBytes(16);
   const key = crypto.scryptSync(passphrase, 'GfG', 24);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
 

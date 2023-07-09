@@ -22,12 +22,19 @@ import { DecryptSecretDto } from './dto/passphrase.dto';
 export class SecretController {
   constructor(private readonly secretService: SecretService) {}
 
+  @Get('/all')
+  async getAllSecrets(): Promise<[SecretEntity[], number]> {
+    const secrets = this.secretService.findAll();
+
+    return secrets;
+  }
+
   @ApiParam({
     name: 'uri',
     type: String,
     description: 'Unique Identifier of the secret.',
   })
-  @Get('/:uri')
+  @Get('/view/:uri')
   async getSecretByUri(
     @Param('uri') uri,
   ): Promise<SecretEntity | ICommonResponse> {
@@ -49,7 +56,7 @@ export class SecretController {
     return secret;
   }
 
-  @Post()
+  @Post('/create')
   async createSecret(@Body() data: CreateSecretDto) {
     const { validFor, viewsAllowed, passphrase, secret: secretContent } = data;
 

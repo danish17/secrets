@@ -12,6 +12,14 @@ export class SecretService {
   ) {}
 
   /**
+   * Find All Secrets
+   * @returns Array
+   */
+  async findAll(): Promise<[SecretEntity[], number]> {
+    const secrets = await this._repository.findAndCount();
+    return secrets;
+  }
+  /**
    * Find secret by its ID.
    * @param uri
    * @returns Secret Entity

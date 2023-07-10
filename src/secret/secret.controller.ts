@@ -52,7 +52,6 @@ export class SecretController {
       return Response.EXPIRED;
     }
 
-    await this.secretService.decreaseViews(secret);
     return secret;
   }
 
@@ -107,6 +106,8 @@ export class SecretController {
       data.passphrase,
       secret.iv,
     );
+
+    await this.secretService.decreaseViews(secret);
 
     return decryptedMessage;
   }

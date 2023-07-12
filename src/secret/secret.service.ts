@@ -69,9 +69,11 @@ export class SecretService {
       .orderBy('secret.id', 'DESC')
       .getOne();
 
+    const last_id = last_record ? last_record.id : 1;
+
     const digest = crypto
       .createHash('md5')
-      .update(last_record.id.toString())
+      .update(last_id.toString())
       .digest('base64');
 
     return digest.replaceAll(/[^a-zA-Z0-9 -]/g, '').substring(0, 7);

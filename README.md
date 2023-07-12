@@ -5,8 +5,7 @@
 
 # Secrets API
 
- A simple API to create n-times viewable secrets.</p>
-  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/724892df13e34f62bc989fc40ea9c216)](https://app.codacy.com/gh/danish17/secrets/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+ A simple API to create n-times viewable secrets.
 
 </center>
 

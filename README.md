@@ -60,7 +60,7 @@ GET /secret/view/ZRK9Q9n
 POST /secret/create
 ```
 
-#### Schema
+#### Body
 
 ```json
 {
